@@ -67,3 +67,6 @@ textView.setText(String.format(getResources().getString(R.string.test),"Rowandjj
 |0|数字前面补0|("%04d",99)|0099|
 |,|以逗号分隔数字|("%,d",1000000)|1,000,000|
 |$|被格式化的参数索引|	("%1$d,%2$s",99,"abc")|99,abc|
+
+参考:
+[http://developer.android.com/intl/zh-cn/guide/topics/resources/string-resource.html#FormattingAndStyling]（http://developer.android.com/intl/zh-cn/guide/topics/resources/string-resource.html#FormattingAndStyling）

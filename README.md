@@ -3,6 +3,9 @@
 
 1. [Service#onStartCommand返回值解析](https://github.com/Rowandjj/my_awesome_blog/tree/master/service_onStartCommand)
 
+2.
+[字符串格式化在android上的应用](https://github.com/Rowandjj/my_awesome_blog/tree/master/string_placeholder)
+
 
 ## 关于我:
 

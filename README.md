@@ -5,6 +5,7 @@
 
 2. [字符串格式化在android上的应用](https://github.com/Rowandjj/my_awesome_blog/tree/master/string_placeholder)
 
+3. [2015年终总结](https://github.com/Rowandjj/my_awesome_blog/tree/master/byebye_2015)
 
 ## 关于我:
 

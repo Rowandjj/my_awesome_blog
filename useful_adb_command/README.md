@@ -41,3 +41,21 @@
 	```
 	adb shell pm clear package_name
 	```
+
+7. 应用启动耗时
+
+	```
+	adb shell am start -W package_name/activity_name
+	```
+  结果:
+
+	```
+	Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER]
+		 cmp=com.taobao.aaa/.ui.activity.XActivity }
+	Status: ok
+	Activity: com.taobao.auction/.ui.activity.XActivity
+	ThisTime: 110
+	TotalTime: 110
+	WaitTime: 117
+	Complete
+	```

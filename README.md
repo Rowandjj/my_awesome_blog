@@ -7,6 +7,10 @@
 
 3. [2015年终总结](https://github.com/Rowandjj/my_awesome_blog/tree/master/byebye_2015)
 
+4. [有用的adb命令](https://github.com/Rowandjj/my_awesome_blog/tree/master/useful_adb_command)
+
+5. [webpack笔记](https://github.com/Rowandjj/my_awesome_blog/tree/master/webpack_guide)
+
 ## 关于我:
 
 1. 男，android程序猿,现就职于淘宝。

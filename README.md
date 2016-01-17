@@ -13,7 +13,7 @@
 
 6. [android启动优化相关](https://github.com/Rowandjj/my_awesome_blog/tree/master/launch_performance)
 
-7. [npm笔记]()
+7. [npm笔记](https://github.com/Rowandjj/my_awesome_blog/tree/master/npm_get_started)
 
 ## 关于我:
 

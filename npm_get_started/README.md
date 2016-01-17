@@ -31,8 +31,11 @@
 ## 关于版本
 
 如果你当前的版本是1.0.4,那么有以下几种选择(package.json中)
+
 1. Patch releases: 1.0 or 1.0.x or ~1.0.4
+
 2. Minor releases: 1 or 1.x or ^1.0.4
+
 3. Major releases: * or x
 
 

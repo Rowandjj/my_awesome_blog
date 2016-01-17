@@ -11,6 +11,8 @@
 
 5. [webpack笔记](https://github.com/Rowandjj/my_awesome_blog/tree/master/webpack_guide)
 
+6. [android启动优化相关](https://github.com/Rowandjj/my_awesome_blog/tree/master/launch_performance)
+
 ## 关于我:
 
 1. 男，android程序猿,现就职于淘宝。

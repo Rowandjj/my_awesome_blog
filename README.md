@@ -13,6 +13,8 @@
 
 6. [android启动优化相关](https://github.com/Rowandjj/my_awesome_blog/tree/master/launch_performance)
 
+7. [npm笔记]()
+
 ## 关于我:
 
 1. 男，android程序猿,现就职于淘宝。

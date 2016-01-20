@@ -21,3 +21,8 @@
 2. 规律: `compileSdkVersion`>= `targetSdkVersion`>=`minSdkVersion`
 
 3. 区别:`compileSdkVersion`不会被打进apk，而`targetSdkVersion`和`minSdkVersion`会打进apk.
+
+
+#### 参考资料
+
+1. [如何选择 compileSdkVersion, minSdkVersion 和 targetSdkVersion](http://chinagdg.org/2016/01/picking-your-compilesdkversion-minsdkversion-targetsdkversion/)

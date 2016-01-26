@@ -17,6 +17,8 @@
 
 8. [compileSdkVersion/targetSdkVersion/minSdkVersion区别](https://github.com/Rowandjj/my_awesome_blog/tree/master/compileSdk_minSdk_targetSdk_difference)
 
+9. [apk瘦身方案](https://github.com/Rowandjj/my_awesome_blog/tree/master/keep_your_apk_small)
+
 ## 关于我:
 
 1. 男，android程序猿,现就职于淘宝。

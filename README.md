@@ -19,6 +19,8 @@
 
 9. [apk瘦身方案](https://github.com/Rowandjj/my_awesome_blog/tree/master/keep_your_apk_small)
 
+10. [关于imeOptions](https://github.com/Rowandjj/my_awesome_blog/tree/master/android_EditText_imeOptions)
+
 ## 关于我:
 
 1. 男，android程序猿,现就职于淘宝。

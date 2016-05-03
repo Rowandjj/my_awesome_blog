@@ -27,7 +27,7 @@ fab间接继承自`ImageView`，因而拥有`ImageView`的大部分特性。但�
 
 从构造器开始：
 
-```
+```java
 public FloatingActionButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 		 //检查是否使用Theme.Appcompat主题
@@ -53,7 +53,7 @@ public FloatingActionButton(Context context, AttributeSet attrs, int defStyleAtt
 ```
 构造器中主要是拿到用户设置的自定义属性，比如着色、波纹颜色、大小等等,一共有以下几个属性可以定义。
 
-```
+```xml
 <declare-styleable name="FloatingActionButton">
 <attr name="backgroundTint"/>
 <attr name="backgroundTintMode"/>
@@ -71,7 +71,7 @@ public FloatingActionButton(Context context, AttributeSet attrs, int defStyleAtt
 ```
 属性的默认值定义如下：
 
-```
+```xml
  <style name="Widget.Design.FloatingActionButton" parent="android:Widget">
  
         <item name="android:background">@drawable/design_fab_background</item>
@@ -87,7 +87,7 @@ public FloatingActionButton(Context context, AttributeSet attrs, int defStyleAtt
 
 需要注意的是`android:background`属性，这里指定了background为`design_fab_background`,并且不允许改变:
 
-```
+```java
   @Override
     public void setBackgroundDrawable(Drawable background) {
         Log.i(LOG_TAG, "Setting a custom background is not supported.");
@@ -95,7 +95,7 @@ public FloatingActionButton(Context context, AttributeSet attrs, int defStyleAtt
 ```
 那么我们来看下这个background长啥样：
 
-```
+```xml
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
         android:shape="oval">
     <solid android:color="@android:color/white" />
@@ -105,14 +105,14 @@ public FloatingActionButton(Context context, AttributeSet attrs, int defStyleAtt
 
 drawable.java
 
-```
+```java
 public void setColorFilter(@ColorInt int color, @NonNull PorterDuff.Mode mode) {
         setColorFilter(new PorterDuffColorFilter(color, mode));
     }
 ```
 默认的着色模式为SRC_IN：
 
-```
+```java
     static final PorterDuff.Mode DEFAULT_TINT_MODE = PorterDuff.Mode.SRC_IN;
 
 ```
@@ -120,14 +120,14 @@ public void setColorFilter(@ColorInt int color, @NonNull PorterDuff.Mode mode) {
 在fab构造的时候，会指定着色为`？attr/colorAccent`，即当前主题的`colorAccent`属性值。
 然后执行如下代码，进行着色。
 
-```
+```java
  getImpl().setBackgroundDrawable(mBackgroundTint, mBackgroundTintMode,
                 mRippleColor, mBorderWidth);
 ```
 
 因为不同版本间的实现略有不同，所以这里会根据不同版本创建不同的`FloatingActionButtonImpl`实现类：
 
-```
+```java
 private FloatingActionButtonImpl createImpl() {
         final int sdk = Build.VERSION.SDK_INT;
         if (sdk >= 21) {
@@ -144,7 +144,7 @@ private FloatingActionButtonImpl createImpl() {
 
 先创建着色的背景drawable。
 
-```
+```java
  GradientDrawable createShapeDrawable() {
         GradientDrawable d = new GradientDrawable();
         d.setShape(GradientDrawable.OVAL);
@@ -154,7 +154,7 @@ private FloatingActionButtonImpl createImpl() {
 ```
 再对此drawable设置tint：
 
-```
+```java
 @Override
     void setBackgroundDrawable(ColorStateList backgroundTint,
             PorterDuff.Mode backgroundTintMode, int rippleColor, int borderWidth) {
@@ -193,7 +193,7 @@ private FloatingActionButtonImpl createImpl() {
 
 fab如何控制控件大小只有这两种规格呢(这样说不准确，事实上你可以通过设置fab的`layout_width`/`layout_height`指定为任意大小，但是我们最好按照MD规范来)?必然是通过复写`onMeasure`啦:
 
-```
+```java
   @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //我们希望的大小
@@ -214,7 +214,7 @@ fab如何控制控件大小只有这两种规格呢(这样说不准确，事实�
 
 其中`getSizeDimension`方法计算出来的是我们期望的大小:
 
-```
+```java
 final int getSizeDimension() {
         switch (mSize) {
             case SIZE_MINI:
@@ -237,7 +237,7 @@ fab还支持fab以动画的方式显现/隐藏，通常和AppBarLayout一起使�
 
 那么动画是如何实现的呢:
 
-```
+```java
 private void show(OnVisibilityChangedListener listener, boolean fromUser) {
         getImpl().show(wrapOnVisibilityChangedListener(listener), fromUser);
     }
@@ -251,7 +251,7 @@ private void hide(@Nullable OnVisibilityChangedListener listener, boolean fromUs
 
 以`hide()`为例，使用属性动画较为简单，直接使用`View#animate()`即可链式调用。
 
-```
+```java
 @Override
     void hide(@Nullable final InternalVisibilityChangedListener listener, final boolean fromUser) {
         if (mIsHiding || mView.getVisibility() != View.VISIBLE) {
@@ -309,7 +309,7 @@ private void hide(@Nullable OnVisibilityChangedListener listener, boolean fromUs
 
 如果使用传统动画的话，则先在xml中定义好动画，然后构造`Animation`实例，启动动画。
 
-```
+```java
  @Override
     void hide(@Nullable final InternalVisibilityChangedListener listener, final boolean fromUser) {
         if (mIsHiding || mView.getVisibility() != View.VISIBLE) {
@@ -353,7 +353,7 @@ fab并不直接与`CoordinatorLayout`联系，而是通过`CoordinatorLayout#Beh
 
 fab内部实现了`CoordinatorLayout#Behavior`抽象类，并有选择性地实现了三个方法:
 
-```
+```java
 public boolean layoutDependsOn(CoordinatorLayout parent,
                 FloatingActionButton child, View dependency);
                 
@@ -375,7 +375,7 @@ fab需要在`snackBar`弹出的时候自动向上平移，这就得知道SnackBa
 
 这里当然是SnackBar了。（注意哦，SnackBar最终展现的是SnackbarLayout，SnackBar本身并不是View）
 
-```
+```java
 private static final boolean SNACKBAR_BEHAVIOR_ENABLED = Build.VERSION.SDK_INT >= 11;
 
  @Override
@@ -392,7 +392,7 @@ private static final boolean SNACKBAR_BEHAVIOR_ENABLED = Build.VERSION.SDK_INT >
 
 fab就可以更新自己的UI拉（这里当然是平移喽）:
 
-```
+```java
 @Override
         public boolean onDependentViewChanged(CoordinatorLayout parent, FloatingActionButton child,
                 View dependency) {
@@ -409,7 +409,7 @@ fab就可以更新自己的UI拉（这里当然是平移喽）:
 
 如果是SnackBar状态变化了，那么fab就会根据情况进行平移：
 
-```
+```java
 private void updateFabTranslationForSnackbar(CoordinatorLayout parent,
                 final FloatingActionButton fab, View snackbar) {
             final float targetTransY = getFabTranslationYForSnackbar(parent, fab);
@@ -456,7 +456,7 @@ private void updateFabTranslationForSnackbar(CoordinatorLayout parent,
 
 前面说到AppBarLayout和fab一起使用可以完成另一个效果，即AppBarLayout伸缩时，fab也可以以动画的形式显现、隐藏，其实现如下：
 
-```
+```java
 private boolean updateFabVisibility(CoordinatorLayout parent,
                 AppBarLayout appBarLayout, FloatingActionButton child) {
             final CoordinatorLayout.LayoutParams lp =
@@ -495,7 +495,7 @@ private boolean updateFabVisibility(CoordinatorLayout parent,
 
 除此之外，`fab#Behavior`还实现了`onLayoutChild`,主要是为了根据AppBarLayout的当前状态来判断自己是否需要隐藏。
 
-```
+```java
  @Override
         public boolean onLayoutChild(CoordinatorLayout parent, FloatingActionButton child,
                 int layoutDirection) {
@@ -520,7 +520,7 @@ private boolean updateFabVisibility(CoordinatorLayout parent,
 
 CoordinatorLayout#onLayout
 
-```
+```java
  @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         final int layoutDirection = ViewCompat.getLayoutDirection(this);
@@ -540,14 +540,14 @@ CoordinatorLayout#onLayout
 如果该Behavior实现了OnLayoutChild，并且返回了true，那么将不会执行`CoordinatorLayout #onLayoutChild `,否则执行默认的布局方案。
 最后一点，这里的Behavior如何生效的呢？通过注解：
 
-```
+```java
 @CoordinatorLayout.DefaultBehavior(FloatingActionButton.Behavior.class)
 public class FloatingActionButton extends VisibilityAwareImageButton {
 ```
 
 `CoordinatorLayout `在解析孩子的`LayoutParams`时，会check有无注解：
 
-```
+```java
   LayoutParams getResolvedLayoutParams(View child) {
         final LayoutParams result = (LayoutParams) child.getLayoutParams();
         if (!result.mBehaviorResolved) {

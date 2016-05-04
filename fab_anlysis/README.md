@@ -1,6 +1,7 @@
 FloatingActionButton源码解析
+==
 
-### 背景
+## 背景
 
 FloatingActionButton（下文以fab代替）是android support design组件库中提供的一个视图控件，是material design设计中fab的官方实现。
 
@@ -15,15 +16,15 @@ FloatingActionButton（下文以fab代替）是android support design组件库�
 > http://android-developers.blogspot.hk/2015/05/android-design-support-library.html
 
 
-### 开始
+## 开始
 
 源码版本:23.3.0
 
 ![类图](./01.png)
 
-fab间接继承自`ImageView`，因而拥有`ImageView`的大部分特性。但是其内部还是做了很多定制，我们一一来看。
+fab间接继承自`ImageView`（`ImageButton`是`ImageView`的子类），因而拥有`ImageView`的大部分特性。但是其内部还是做了很多定制，我们一一来看。
 
-#### 1. fab的自定义属性、背景着色相关
+### 1. fab的自定义属性、背景着色相关
 
 从构造器开始：
 
@@ -110,12 +111,13 @@ public void setColorFilter(@ColorInt int color, @NonNull PorterDuff.Mode mode) {
         setColorFilter(new PorterDuffColorFilter(color, mode));
     }
 ```
-默认的着色模式为SRC_IN：
+默认的着色模式为SRC_IN(取交集、显示上层，故底层白色会被忽略)：
 
 ```java
     static final PorterDuff.Mode DEFAULT_TINT_MODE = PorterDuff.Mode.SRC_IN;
 
 ```
+
 
 在fab构造的时候，会指定着色为`？attr/colorAccent`，即当前主题的`colorAccent`属性值。
 然后执行如下代码，进行着色。
@@ -187,7 +189,7 @@ private FloatingActionButtonImpl createImpl() {
 ```
 经过着色，fab就呈现出我们想要的颜色啦。
 
-#### 2. fab的大小
+### 2. fab的大小
 
 再来看fab的大小，fab有两种大小，一种是`NORMAL`，一种是`MINI`，实际大小分别是56dp和40dp，其定义可以在design库的values.xml中看到。
 
@@ -230,7 +232,7 @@ final int getSizeDimension() {
 但是最终的值还是得看我们设置的LayoutParams。关于控件测量相关内容不在此文介绍范围内，大家可以自行google。
 
 
-#### 3.fab的动画
+### 3.fab的动画
 
 fab还支持fab以动画的方式显现/隐藏，通常和AppBarLayout一起使用，可以通过`hide()`/`show()`两个方法控制。
 
@@ -344,14 +346,128 @@ private void hide(@Nullable OnVisibilityChangedListener listener, boolean fromUs
 ```
 
 
-#### 4. fab与CoordinatorLayout的交互
+### 4. fab与CoordinatorLayout的交互
+
+>这块内容因为与`CoordinatorLayout`/`CoordinatorLayout#Behavior`有很大关联，如果不熟悉，请先google相关资料。本文假设读者对这块内容已经有一定理解。
+
 
 fab并不直接与`CoordinatorLayout`联系，而是通过`CoordinatorLayout#Behavior`作为桥梁。`CoordinatorLayout`类通过`CoordinatorLayout#Behavior`可以间接控制其直系子View的行为，能控制什么行为？View测量、布局、touch事件拦截、监听、NestedScroll等等。是不是很屌。
-关于这块内容也不在本文范围内，大家可以自行参考相关资料。
 
 
 
-fab内部实现了`CoordinatorLayout#Behavior`抽象类，并有选择性地实现了三个方法:
+
+
+fab内部实现了`CoordinatorLayout#Behavior`抽象类。该抽象类有如下接口:
+
+```java
+public static abstract class Behavior<V extends View> {
+
+		...
+   
+        public boolean onInterceptTouchEvent(CoordinatorLayout parent, V child, MotionEvent ev) {
+            return false;
+        }
+
+        public boolean onTouchEvent(CoordinatorLayout parent, V child, MotionEvent ev) {
+            return false;
+        }
+
+       ...
+        /**
+         * Determine whether the supplied child view has another specific sibling view as a
+         * layout dependency.
+         *
+         * <p>This method will be called at least once in response to a layout request. If it
+         * returns true for a given child and dependency view pair, the parent CoordinatorLayout
+         * will:</p>
+         * <ol>
+         *     <li>Always lay out this child after the dependent child is laid out, regardless
+         *     of child order.</li>
+         *     <li>Call {@link #onDependentViewChanged} when the dependency view's layout or
+         *     position changes.</li>
+         * </ol>
+         */
+        public boolean layoutDependsOn(CoordinatorLayout parent, V child, View dependency) {
+            return false;
+        }
+
+        /**
+         * Respond to a change in a child's dependent view
+         *
+         * <p>This method is called whenever a dependent view changes in size or position outside
+         * of the standard layout flow. A Behavior may use this method to appropriately update
+         * the child view in response.</p>
+         *
+         * <p>A view's dependency is determined by
+         * {@link #layoutDependsOn(CoordinatorLayout, android.view.View, android.view.View)} or
+         * if {@code child} has set another view as it's anchor.</p>
+         *
+         * <p>Note that if a Behavior changes the layout of a child via this method, it should
+         * also be able to reconstruct the correct position in
+         * {@link #onLayoutChild(CoordinatorLayout, android.view.View, int) onLayoutChild}.
+         * <code>onDependentViewChanged</code> will not be called during normal layout since
+         * the layout of each child view will always happen in dependency order.</p>
+         *
+         * <p>If the Behavior changes the child view's size or position, it should return true.
+         * The default implementation returns false.</p>
+         *
+         */
+        public boolean onDependentViewChanged(CoordinatorLayout parent, V child, View dependency) {
+            return false;
+        }
+
+			...
+
+    
+
+        /**
+         * Called when the parent CoordinatorLayout is about the lay out the given child view.
+         *
+         * <p>This method can be used to perform custom or modified layout of a child view
+         * in place of the default child layout behavior. The Behavior's implementation can
+         * delegate to the standard CoordinatorLayout measurement behavior by calling
+         * {@link CoordinatorLayout#onLayoutChild(android.view.View, int)
+         * parent.onLayoutChild}.</p>
+         *
+         * <p>If a Behavior implements
+         * {@link #onDependentViewChanged(CoordinatorLayout, android.view.View, android.view.View)}
+         * to change the position of a view in response to a dependent view changing, it
+         * should also implement <code>onLayoutChild</code> in such a way that respects those
+         * dependent views. <code>onLayoutChild</code> will always be called for a dependent view
+         * <em>after</em> its dependency has been laid out.</p>
+         *
+         */
+        public boolean onLayoutChild(CoordinatorLayout parent, V child, int layoutDirection) {
+            return false;
+        }
+ 
+      ...
+     
+        public void onNestedScroll(CoordinatorLayout coordinatorLayout, V child, View target,
+                int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+            // Do nothing
+        }
+
+    
+    }
+
+
+
+```
+
+看到这个抽象类，有两点需要注意:
+
+ 1. 此抽象类并无抽象方法，也即子类可选择任何想复写的方法进行复写。
+ 2. 此抽象类接受一个泛型。该泛型需要是View的子类。
+
+fab实现此抽象类:
+
+```java
+
+public static class Behavior extends CoordinatorLayout.Behavior<FloatingActionButton> {}
+```
+
+有选择性地实现了三个方法:
 
 ```java
 public boolean layoutDependsOn(CoordinatorLayout parent,
@@ -516,7 +632,7 @@ private boolean updateFabVisibility(CoordinatorLayout parent,
         }
 ```
 
-此方法会在`CoordinatorLayout`对孩子布局的时候进行调用，`CoordinatorLayout `会检查所有的直系孩子，是否设置了Behavior，如果设置了，那么就执行其`onLayoutChild`方法:
+此方法会在`CoordinatorLayout`对孩子布局的时候进行调用(即`CoordinatorLayout#onLayout`)，`CoordinatorLayout `会检查所有的直系孩子，是否设置了Behavior，如果设置了，那么就执行其`onLayoutChild`方法:
 
 CoordinatorLayout#onLayout
 
@@ -578,7 +694,7 @@ public class FloatingActionButton extends VisibilityAwareImageButton {
 
 微博：[楚奕RX](http://weibo.com/u/2331178381?is_all=1)
 
-### License
+## License
 
 ```
 The MIT License (MIT)
